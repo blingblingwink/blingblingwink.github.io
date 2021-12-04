@@ -78,9 +78,9 @@ netease_comment: false
 
 # Sidebar settings
 sidebar: true                           # whether or not using Sidebar.
-sidebar-about-description: "Just Stories"
+sidebar-about-description: "Hi there~"
 #sidebar-avatar: https://github.com/Huxpro.png # use absolute URL, seeing it's used in both `/` and `/about/`
-sidebar-avatar: img/avatar.jpg	 # use absolute URL, seeing it's used in both `/` and `/about/`
+sidebar-avatar: https://github.com/blingblingwink.png	 # use absolute URL, seeing it's used in both `/` and `/about/`
 
 
 
