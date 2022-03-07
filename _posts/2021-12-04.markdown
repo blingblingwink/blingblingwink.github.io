@@ -1,7 +1,7 @@
 ---
 layout:     post
-title:      "你好"
-subtitle:   "Hi there"
+title:      "Hello 2021"
+subtitle:   " \"Hello World, Hello Blog\""
 date:       2021-12-04 21:10:00
 author:     "Ethan"
 header-img: "img/home-bg.jpg"
