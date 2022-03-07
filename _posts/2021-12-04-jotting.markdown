@@ -1,7 +1,7 @@
 ---
 layout:     post
-title:      "Hello 2021"
-subtitle:   " \"Hello World, Hello Blog\""
+title:      "你好^_^"
+subtitle:   "First Commit"
 date:       2021-12-04 21:10:00
 author:     "Ethan"
 header-img: "img/home-bg.jpg"
