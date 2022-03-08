@@ -1,7 +1,7 @@
 ---
 layout:     post
-title:      "Signal process"
-subtitle:   "信号处理"
+title:      "Signal函数"
+#subtitle:   "信号处理"
 date:       2022-03-08 16:37:00
 author:     "Ethan"
 header-img: "img/home-bg.jpg"
@@ -21,7 +21,7 @@ signal函数比sigaction函数更为简单，需要对某一个信号比如SIGIN
 但sigaction不会有这样的问题，不需要重新注册，同时sigaction提供了屏蔽指定信号的功能
 
 # 示例
-```
+```c
 #include<stdio.h>
 #include<stdlib.h>
 #include<signal.h>
@@ -54,4 +54,6 @@ void sigintHandler(int sig_num){
 }
 ```
 # 运行结果
-![result 运行结果](img/blogs/signal.png)
+![img](/img/blogs/signal.png)
+# References
+- <https://blog.csdn.net/wangzuxi/article/details/44814825>
