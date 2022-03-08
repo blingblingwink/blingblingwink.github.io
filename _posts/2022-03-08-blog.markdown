@@ -1,7 +1,7 @@
 ---
 layout:     post
-title:      "signal vs sigaction"
-#subtitle:   "信号处理"
+title:      "系统信号处理"
+subtitle:   "signal vs sigaction"
 date:       2022-03-08 16:37:00
 author:     "Ethan"
 header-img: "img/home-bg.jpg"
@@ -11,7 +11,7 @@ tags:
 ---
 
 
-# signal vs sigaction
+# 区别
 signal函数比sigaction函数更为简单，需要对某一个信号比如SIGINT指定一个handler，如果程序运行中收到这个信号，则会由handler负责处理。
 但需要注意的是，**signal注册的handler只能被使用一次**，调用handler处理相应信号后，之后再收到这个信号将会按照系统`默认方式`处理。
 
