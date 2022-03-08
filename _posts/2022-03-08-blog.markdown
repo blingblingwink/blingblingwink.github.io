@@ -1,0 +1,61 @@
+---
+layout:     post
+title:      "Signal process"
+subtitle:   "信号处理"
+date:       2022-03-08 16:37:00
+author:     "Ethan"
+header-img: "img/home-bg.jpg"
+catalog: false
+tags:
+    - 学习
+---
+
+> “signal vs sigaction”
+
+
+#区别
+signal函数比sigaction函数更为简单，需要对某一个信号比如SIGINT指定一个handler，如果程序运行中收到这个信号，则会由handler负责处理。
+
+但需要注意的是，signal注册的handler只能被使用一次，调用handler处理相应信号后，之后再收到这个信号将会按照系统默认方式处理。因此，
+
+如果需要一直让handler处理这个信号，需要每次在handler函数内部重新用signal函数注册一次handler（一般在handler开始处注册）。
+
+但这其实依然有可能带来问题，因为有可能在进入handler后，重新注册handler之前，程序又收到了这个信号，比如SIGINT，那么就按照默认方式处理，
+
+即退出程序。
+
+但sigaction不会有这样的问题，不需要重新注册，同时sigaction提供了屏蔽指定信号的功能
+
+#示例
+```
+#include<stdio.h>
+#include<stdlib.h>
+#include<signal.h>
+#include<windows.h>
+int num=1;
+
+void sigintHandler(int);
+
+int main(void){
+    signal(SIGINT, sigintHandler);
+    while(TRUE){
+        printf("main thread running\n");
+        Sleep(1000);
+        raise(SIGINT);
+    }
+}
+
+/* Signal Handler for SIGINT */
+void sigintHandler(int sig_num){
+    signal(SIGINT, sigintHandler);
+    if(num<10){
+        printf("guess what, i am still alive\n");
+        num++;
+    }else{
+        printf("oops, my life ended\n");
+        getchar();
+        exit(0);
+    }
+    fflush(stdout);
+}
+```
