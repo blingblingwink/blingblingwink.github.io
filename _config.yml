@@ -104,9 +104,9 @@ page-mathjax: false
 # Friends
 friends: [
     {
-    #     title: "Su",
-    #     href: "http://su.gallery/"
-    # },{
+        title: "Felix",
+        href: "https://github.com/Felix991205"
+     },{
         title: "QifanWang",
         href: "https://qifanwang.github.io/"
     }

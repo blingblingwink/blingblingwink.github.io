@@ -13,9 +13,9 @@ tags:
 
 # 区别
 signal函数比sigaction函数更为简单，需要对某一个信号比如SIGINT指定一个handler，如果程序运行中收到这个信号，则会由handler负责处理。
-但需要注意的是，**signal注册的handler只能被使用一次**，调用handler处理相应信号后，之后再收到这个信号将会按照系统`默认方式`处理。
+但需要注意的是，**signal注册的handler只能被使用一次**，调用handler处理相应信号后，之后再收到这个信号将会按照系统**`默认方式`**处理。
 
-因此，如果需要一直让handler处理这个信号，需要每次在handler函数内部重新用signal函数注册一次handler（一般在handler开始处注册）。
+因此，如果需要一直让handler处理这个信号，需要每次在handler函数内部重新用signal函数注册一次handler（一般在handler开始处注册），当然，你可以注册另一个自定义的handler。
 但这其实依然有可能带来问题，因为有可能在进入handler后，重新注册handler之前，程序又收到了这个信号，比如SIGINT，那么就按照默认方式处理，即退出程序。
 
 但sigaction不会有这样的问题，不需要重新注册，同时sigaction提供了屏蔽指定信号的功能
@@ -55,5 +55,6 @@ void sigintHandler(int sig_num){
 ```
 # 运行结果
 ![img](/img/blogs/signal.png)
+如图所示，程序在收到SIGINT信号后，会转入sigintHandler函数进行处理，直到第10次接收SIGINT信号程序才退出。
 # References
 - <https://blog.csdn.net/wangzuxi/article/details/44814825>
