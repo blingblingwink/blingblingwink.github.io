@@ -26,7 +26,7 @@ signal的函数声明可以说的上是顶尖难度，如下所示：
 
 可以说，初看一头雾水，但利用David Anderson发明的Clockwise/Spiral Rule（见**References**）可以很好地去理解这个声明，规则如下：
 - 从变量名开始，顺时针地螺旋前进，逐一分析语句含义，直到所有的token都被读取
-- 括号内地token优先分析
+- 括号内的token优先分析
 
 So，let's get started.
 从signal开始顺时针读取下一个token是(，说明signal是一个函数，进入了括号，那就先把括号内的token都分析完，也就是内部的这个
