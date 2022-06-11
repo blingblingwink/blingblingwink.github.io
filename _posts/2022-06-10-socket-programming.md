@@ -2,7 +2,7 @@
 layout:     post
 title:      "socket编程基础"
 subtitle:   "Basic socket programming"
-date:       2022-06-10 16:12:00
+date:       2022-06-11 19:16:00
 author:     "Ethan"
 catalog: false
 header-style: text
@@ -18,6 +18,7 @@ tags:
 
 值得注意的是，socket其实是个文件描述符，因此socket编程时接收/发送远程主机的数据仿佛就是在读取/写入本地文件一样，我也对**一切都是文件**这个概念有了更深的体会。说句题外话，还有啥意想不到的东西是文件呢？其实平时用的键盘对应的是标准输入文件stdin，看的显示器对应的是标准输出文件stdout。
 # 整体流程
+
 ## server
 1. 创建socket
 2. 绑定端口-bind
@@ -25,12 +26,15 @@ tags:
 4. 接受请求-accept
 5. 进行通信-write&read
 6. 释放资源-close
+
 ## client
 1. 创建socket
 2. 请求连接-connect
 3. 进行通信-write&read
 4. 释放资源-close
+
 # 具体流程--server
+
 ## 创建socket
 `int socket(int af, int type, int protocol)`  
 功能：创建socket并确定相关属性  
@@ -40,6 +44,7 @@ tags:
 - protocol：传输协议，常用的有IPPROTO_TCP和IPPROTO_UDP，分别表示TCP和UDP协议
 
 一般情况下，只需要前两个参数就能确定使用什么协议了，所以第三个参数置为0就行，系统自动推算应该选取什么协议。
+
 ## 绑定端口
 `int bind(int sock, struct sockaddr *addr, socklen_t addrlen)`  
 功能：将创建的socket和指定的IP地址和端口号绑定  
@@ -75,6 +80,7 @@ struct sockaddr_in6 {
     uint32_t sin6_scope_id;  //(4)接口范围ID
 };
 ```
+
 ## 监听端口
 `int listen(int sock, int backlog)`  
 功能：让创建的socket监听相应端口是否有请求  
@@ -92,8 +98,10 @@ struct sockaddr_in6 {
 
 第二个参数记录了客户端的IP地址和端口信息，但其实编程时我们并不知道客户端的IP地址和端口信息啊，没错，这个参数是输入给accept函数，在函数体内完成赋值的，accept函数从请求队列里选取第一个客户端请求，把它的IP地址和端口信息赋值给这个指针指向的结构体，然后返回一个新创建的socket，这个socket用来之后和客户端的通信。  
 请注意，listen后面的代码会继续执行，但accpet会检查请求队列是否为空，如果为空则一直等待，即阻塞程序的执行，如果不为空则选取队列的第一个连接请求进行建立连接
+
 ## 进行通信
 因为socket就是个文件描述符，所以通信过程就跟写入/读取文件一样
+
 ### 发送
 `ssize_t write(int fd, const void *buf, size_t nbytes)`  
 功能：将缓冲区buf的前nbytes个字节写入fd指示的文件  
@@ -101,6 +109,7 @@ struct sockaddr_in6 {
 - fd：accept函数返回的新socket
 - buf：存储发送数据的缓冲区
 - nbytes：准备发送（写入）的字节数
+
 ### 接收
 `ssize_t read(int fd, void *buf, size_t nbytes)`  
 功能：从fd指示的文件读取前nbytes字节到缓冲区buf里，注意：nbytes是这次读取操作能读到的最多的字节数，不一定每次都能读到这么多  
@@ -108,10 +117,12 @@ struct sockaddr_in6 {
 - fd：accept函数返回的新socket
 - buf：存储接收信息流的缓冲区
 - nbytes：准备接收（读取）的字节数
+
 ### socket缓冲区
 socket被创建后，会分配两个缓冲区，分别是接收缓冲区和发送缓冲区，**注意**：这两个缓冲区对程序员是不可见的，和上面write/read函数声明里的缓冲区buf完全不是一回事。  
 严格来讲，write函数不是直接将数据写入另一个主机，而是仅仅将数据写入发送缓冲区，然后交由TCP协议去发送给目标主机，如果正在发送数据或者发送缓冲区满了，那么write函数是不能写入的，也就是会被阻塞；同理，read函数也不是直接读取另一个主机的数据，而是读取接收缓冲区的数据，接收缓冲区的数据是由TCP协议根据接受到的数据自动填充的。  
 发送缓冲区发送出去的数据，只有在收到了相应的ACK后才会被清除，为后续待发的数据腾出空间，如果没有收到ACK，意味着可能存在丢包现象，需要重发。接受端则是在收到数据后自动发送ACK确认报文，但如果接收端的应用程序一直不去读取接收缓冲区，那么久而久之接收缓冲区就会满，那么接收端就不会再接收新的数据了，也就不存在回送ACK报文了，因此发送端一直收不到新的ACK，数据一直得不到清除，发送缓冲区也会满，write函数就会被阻塞。
+
 ## 释放资源
 `int close (int __fd)`  
 功能：关闭socket，不再与另一主机通信（包括接收和发送）  
@@ -120,9 +131,12 @@ socket被创建后，会分配两个缓冲区，分别是接收缓冲区和发�
 - 关闭接收
 - 关闭发送
 - 同时关闭接收和发送
+
 # 具体流程--client
+
 ## 创建socket
 同服务端
+
 ## 请求连接
 `int connect(int sock, struct sockaddr *serv_addr, socklen_t addrlen)`  
 功能：请求和指定服务端建立连接  
@@ -130,12 +144,16 @@ socket被创建后，会分配两个缓冲区，分别是接收缓冲区和发�
 - sock：新创建的socket
 - serv_addr：指示了服务器的IP地址和端口号，同上，需要类型转换，这是为了能够同时支持IPv4和IPv6地址
 - addrlen：serv_addr指示的结构体的大小
+
 ## 进行通信
 同上，包含write和read函数
+
 ## 释放资源
 同上，包含close和shutdown两种
+
 # 代码示例
 以下示例实现了一个回声服务器，客户端输入除"quit"之外的任何字符串，服务端就返回相同的字符串，这个过程可以重复进行，输入"quit"则退出程序。
+
 ## server.cpp
 ```
 #include<stdio.h>
@@ -203,6 +221,7 @@ int main(){
     close(sock);
 }
 ```
+
 # client.cpp
 ```
 #include <stdio.h>
@@ -264,6 +283,7 @@ int main(){
     close(sock);
 }
 ```
+
 # References
 - https://www.bogotobogo.com/cplusplus/sockets_server_client.php
 - http://c.biancheng.net/cpp/html/3029.html
