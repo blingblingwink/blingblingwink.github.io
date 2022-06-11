@@ -7,7 +7,6 @@ author:     "Ethan"
 catalog: false
 header-style: text
 tags:
-    - 学习
     - 数据库
 ---
 >System is Art of Compromise
