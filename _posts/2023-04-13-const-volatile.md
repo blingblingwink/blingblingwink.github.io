@@ -15,7 +15,7 @@ tags:
 This is my first blog written purely in English.
 
 # const
-I've seen many people saying that a const variable is constant, even in cppreference.com, which however, I think is a misleading explanation. I prefer to regard const qualifier as **read-only**, but it might still change in the future (e.g. modified by other processes instead of you). When speaking of const, we need to distinguish const variable from pointer to const. Any direct write to const variable leads to compile-time error, any indirect write (through reference or pointer) leads to undefined behavior, so basically we can regard const variable as **real constant**. However, things are different when it comes to the pointer to const, which aims at delivering safe code, e.g.
+I've seen many people saying that a const variable is constant, even in cppreference.com, which however, I think is a misleading explanation. I prefer to regard const qualifier as **read-only**, but it might still change in the future (e.g. modified by other processes instead of you). When speaking of const, we need to distinguish const variable from pointer to const. Any direct write to const variable leads to compile-time error, any indirect write (through reference or pointer) leads to undefined behavior, so basically we can regard const variable as **real constant**. However, things are different when it comes to the pointer to const, which aims at **delivering safe code**, e.g.
 ```
 void readOnly(const int *p){
     while(true){
@@ -73,10 +73,10 @@ a.getter() actually implicilty pass a pointer (indicating the address of the obj
 ```
 So apparently for getter, you can not modify any member variable belongs to *p, but since static member variables do not belong to any object, they belong to the class, so const member function is able to modify static member variables.
 
-And due to the fact that a pointer to constant can not convert to a pointer to non-constant, while a pointer to non-constant can convert to a pointer to constant, a constant object can only invoke const member function, a non-constant object can invoke both const and non-const member function.
+And due to the fact that a pointer to constant can not convert to a pointer to non-constant, but not vice versa, a const object can only invoke const member function, a non-const object can invoke both const and non-const member function.
 
 # mutable
-Const member functions aim at safe code: do not change what you should not change, however, sometimes we need to allow exceptions, e.g. a getter function may need to lock a mutex first before accessing data members under the situation of multithreaded programming. However, const member functions are not allowed to modify any member variables regardless of directly or indirectly (invoking another function) and mutex.lock() is a function invocation that will modify mutex itself, so contradiction happens and here mutable comes. 
+As mentioned above, const member functions aim at delivering safe code: do not change what you should not change, however, sometimes we need to allow exceptions, e.g. a getter function may need to lock a mutex first before accessing data members under the situation of multithreaded programming. However, const member functions are not allowed to modify any member variables regardless of directly or indirectly (invoking another function) and mutex.lock() is a function invocation that will modify mutex itself, so contradiction happens and here mutable comes. 
 By indicating a member variable as mutable, we can modify it inside a const member function, e.g.
 ```
 class A{
@@ -93,12 +93,13 @@ private:
 };
 ```
 Attention, **declaring member variable as mutable actually make it lose the property of const when it belongs to a const object**, i.e. a mutable member variable of const object might change.
+
 Of course, the following code does not make sense and produces compile-time error (you can not modify a constant anyway).
 ```
 	mutable const mutex m;
 ```
 # volatile
-Volatile prohibits all possible compiler optimization and ensures every access to this variable is through every actual memory access instead of cache. Volatile is mostly used in inter-process communication through shared memory or communication with hardware through register. So volatile is mainly present in embedded system programming, take an example for explanation (from stack overflow),
+Volatile prohibits all possible compiler optimization and ensures every access to this variable is through every actual memory access instead of cache. Volatile is mostly used in inter-process communication through shared memory or communication with hardware through register. So volatile mainly appears in embedded system programming, take an example for explanation (from stack overflow),
 
 ```
 unsigned int const volatile *status_reg; // assume these are assigned to point to the 
@@ -115,9 +116,9 @@ int get_next_char()
     return *recv_reg;
 }
 ```
-Without volatile qualifier, compiler might regard the while loop as unnecessary because no write operation is applied to *states_reg in this program, so program might only read once after compiler optimization. However, status_reg is a pointer that points to a register exists in hardware, whose content might change from time to time depending on outside events. So, from the perspective of programmer, we need to clearly specify that these optimization is prohibited and this is what volatile qualifier does.
+Without volatile qualifier, compiler might regard the while loop as unnecessary because no write operation is applied to *status_reg in this program, so compiler may think it is enough to read only once. However, status_reg is a pointer to a register exists in hardware, whose content might change from time to time depending on outside events. So, from the perspective of a programmer, we need to clearly specify that these optimization is prohibited and volatile qualifier does this duty.
 
-As you can see, for this snippet, the register pointer is defined with both const and volatile, it means the program itself is not allowed to change the value of what the pointer points to, and at the meanwhile, the content of the pointed might change from time to time.
+As you can see from the snippet, the register pointer is defined with both const and volatile, it means the program itself is not allowed to modify what the pointer points to, and at the meanwhile, the content pointed to might change from time to time.
 
 Actually, if you wish, you can define a pointer like this
 ```
